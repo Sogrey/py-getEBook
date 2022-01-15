@@ -3,6 +3,7 @@
 # coding:utf-8
 # import urllib
 # import urllib.request
+from itertools import count
 import requests
 from bs4 import BeautifulSoup
 import multiprocessing
@@ -37,12 +38,13 @@ def get_ChartTxt(url, title, num, totalNum, encoding):
     # [<h1>第1章 大康王朝</h1>]
 
     numLength = len(str(totalNum))
-    # n = "123"
-    # s = n.zfill(5)
-    # assert s == '00123'
-    numStr = num.zfill(numLength)
+    # # n = "123"
+    # # s = n.zfill(5)
+    # # assert s == '00123'
+    numStr = str(num)
+    numStr = numStr.zfill(numLength)
 
-    print('正在下载 (%s/%d) %s %s' % (numStr, totalNum, chartTile, url))
+    print('正在下载 (%s/%s) %s %s' % (numStr, totalNum, chartTile, url))
 
     # 开始计时
     start = time.time()
@@ -50,6 +52,8 @@ def get_ChartTxt(url, title, num, totalNum, encoding):
     # 判断是否有感言
     if re.search(r'.*?章', chartTile) is None:
         return
+
+    # chartTile = re.sub(r'\?', 'o', chartTile)
 
     # 获取章节文本
     content = soup.select('#content')[0].text
@@ -62,6 +66,7 @@ def get_ChartTxt(url, title, num, totalNum, encoding):
     # 单独写入这一章
     try:
         with open(r'.\%s\%s %s.txt' % (title, numStr, chartTile), 'w', encoding='utf-8') as f:
+            # print(content)
             f.write(chartTile + '\n' + content)
         f.close()
         print(num, chartTile, '下载成功')
@@ -81,6 +86,7 @@ def get_ChartTxt(url, title, num, totalNum, encoding):
     return
 # 章节合并
 
+
 def mergeFiles(title, encoding):
     dirPath = r".\%s" % (title)  # 所有txt位于的文件夹路径
     files = os.listdir(dirPath)
@@ -90,9 +96,11 @@ def mergeFiles(title, encoding):
     for file in files:
         if file.endswith(".txt"):
             i += 1
-            print("./"+title + "/" + file)
 
-            with open(title + "/" + file, "r", encoding=encoding) as file:
+            fileName = title + "/" + file
+            print(fileName)
+
+            with open(fileName, "r", encoding=encoding) as file:
                 content = file.read()
                 file.close()
 
@@ -119,15 +127,25 @@ def thread_getOneBook(url, encoding):
     else:
         res.encoding = encoding
 
-    soup = BeautifulSoup(res.text, 'html.parser')  # 对返回的结果进行解析
+    html = res.text
+    soup = BeautifulSoup(html, 'html.parser')  # 对返回的结果进行解析
 
     # 先检查下网页编码
     # <meta http-equiv="Content-Type" content="text/html; charset=gbk">
-    encodingContent = soup.find(
-        attrs={"http-equiv": "Content-Type"})['content']
-    # print(encodingContent)
-    regular = re.compile(r'charset=(.*)')
-    encoding1 = re.findall(regular, encodingContent)[0]
+    # <meta charset="utf-8">
+
+    rmetaCharset = [
+        r'content="text/html; charset=(.*)"',
+        r'charset="(.*)"'
+    ]
+
+    encoding1 = 'gbk'
+    for r in rmetaCharset:
+        regular = re.compile(r)
+        encodingContent = re.findall(regular, html)
+        if(encodingContent != None and len(encodingContent) > 0):
+            encoding1 = encodingContent[0]
+            break
 
     if(encoding1 != encoding):
         thread_getOneBook(url, encoding1)
@@ -155,7 +173,8 @@ def thread_getOneBook(url, encoding):
     charts_url = []
     url_chartTitle = dict()
     # 提取出书的每章节不变的url
-    regular = re.compile(r'[http|https]+://[^\s]*[.com|.cn|.cc]/')
+    regular = re.compile(
+        r'[http|https]+://[^\s]*[.com|.cn|.cc|.la|.net|.biz]/')
     baseUrl = re.findall(regular, url)[0]
 
     print('顶级域名：%s' % (baseUrl))
@@ -166,6 +185,7 @@ def thread_getOneBook(url, encoding):
     # nth-child 在python中运行会报错，需改为 nth-of-type
     # print (soup.select('body > section > div.wrapbox > div:nth-of-type(1) > div > ul > li:nth-of-type(6)'))
     textlist = soup.select('#list a')
+
     for t in textlist:
         # print(type(t))
         # <a href="/book/10258/53450024.html">
@@ -193,7 +213,6 @@ def thread_getOneBook(url, encoding):
 
     totalNum = len(charts_url)
     print('总共找到 %d 章' % (totalNum))
-    # print(url_chartTitle)
 
     # 创建下载这本书的进程
     p = multiprocessing.Pool()
@@ -246,8 +265,14 @@ def process_getAllBook(urls):
 
 
 urls = [
-    # 'http://www.26ksw.cc/book/10258/'
-    'http://www.biquge001.com/Book/17/17605/'
+    # 'http://www.26ksw.cc/book/10258/',
+    'http://www.biquge001.com/Book/17/17605/',
+    # 'https://www.xbiquge.la/7/7877/',
+    # 'http://www.ibiqu.net/book/7/',
+    # 'https://www.biquge.biz/22_22780/',
+    # 'https://www.biqugee.com/book/1366/',
+    # 'https://www.bige7.com/book/11742/'  # .listmain a
+    # 'http://www.b5200.net/50_50537/',
 ]
 
 if __name__ == "__main__":
@@ -256,3 +281,4 @@ if __name__ == "__main__":
     # sort_allCharts(r'.\龙血战神',"龙血战神.txt")
 
     # mergeFiles('明朝败家子', 'gbk')
+    # get_ChartTxt('http://www.ibiqu.net/book/7/16226714.htm', 'dzz', 1, 1, 'gbk')
