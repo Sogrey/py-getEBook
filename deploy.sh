@@ -25,5 +25,3 @@ git commit -m '💖 deploy main branch.'
 git push -f git@github.com:Sogrey/py-getEBook.git main
 
 echo -e "\033[32;40m done \033[0m "
-
-cd -
