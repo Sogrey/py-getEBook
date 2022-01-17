@@ -1,8 +1,5 @@
-# http://www.26ksw.cc/book/10258/
 
 # coding:utf-8
-# import urllib
-# import urllib.request
 from distutils import archive_util
 import sys
 import requests
@@ -76,7 +73,8 @@ def get_ChartTxt(baseUrl, url, title, num, totalNum, encoding):
         f.close()
 
         end = time.time()
-        print('下载 %s %s  完成，运行时间  %0.2f s.' % (num, chapterTile, (end - start)))
+        print('下载 %s %s  完成，运行时间  %0.2f s.' %
+              (num, chapterTile, (end - start)))
 
     except Exception as e:
         print(e)
@@ -92,8 +90,8 @@ def get_ChartTxt(baseUrl, url, title, num, totalNum, encoding):
             f.write(chapterTile+"下载失败 "+url+'\n')
         f.close()
 
-    
     return
+
 # 章节合并
 
 
@@ -248,7 +246,7 @@ def thread_getOneBook(url, encoding):
 
             # print('%d %s %s' % (index, chart_title, chart_url))  # 获取中间文字信息
         except Exception as e:
-            print('[ERROR] '+ str(e))
+            print('[ERROR] ' + str(e))
             continue
 
     totalNum = len(charts_url)
@@ -329,13 +327,12 @@ urls = [
 ]
 
 
-
 if __name__ == "__main__":
 
     argvNum = len(sys.argv)
-    if(argvNum>1):
-        print ('参数个数为:', argvNum, '个参数。')
-        print ('参数列表:', str(sys.argv))
+    if(argvNum >= 2): # 参数1是本文件名 参数2为小说目录页地址
+        print('参数个数为:', argvNum, '个参数。')
+        print('参数列表:', str(sys.argv))
 
         urls = [
             sys.argv[1]
