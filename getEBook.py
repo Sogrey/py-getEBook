@@ -49,9 +49,9 @@ def get_ChartTxt(baseUrl, url, title, num, totalNum, encoding):
     # 开始计时
     start = time.time()
 
-    # 判断是否有感言
-    if re.search(r'.*?章', chapterTile) is None:
-        return
+    # # 判断是否有感言
+    # if re.search(r'.*?章', chapterTile) is None:
+    #     return
 
     chapterTile = re.sub(r'\?', '_', chapterTile)
     chapterTile = re.sub(r'\/', '_', chapterTile)
@@ -64,6 +64,11 @@ def get_ChartTxt(baseUrl, url, title, num, totalNum, encoding):
     content = re.sub(r'\n+', '\n', content)
     content = re.sub(r'<.*?>+', '\n', content)
     content = re.sub(r'&nbsp;+', ' ', content)
+
+    ads = Config[baseUrl]['ads']
+    if(len(ads) > 0):
+        for ad in ads:
+            content = re.sub(r'%s' % (ad), ' ', content)
 
     # 单独写入这一章
     try:
@@ -115,7 +120,13 @@ def mergeFiles(title, encoding):
             append = "\n\n%s" % (content)
             res += append
 
-    with open(r"%s\\%s.txt" % (dirPath, title), "w", encoding=encoding) as outFile:
+    bookPath = r"%s\\%s.txt" % (dirPath, title)  # 文件路径
+    if os.path.exists(bookPath):  # 如果文件存在
+        # 删除文件，可使用以下两种方法。
+        os.remove(bookPath)
+        # os.unlink(path)
+
+    with open(bookPath, "w", encoding=encoding) as outFile:
         outFile.write(res)
         outFile.close()
     print('整书《%s》合并完成，总字数：%d' % (title, len(res)))
@@ -144,8 +155,8 @@ def thread_getOneBook(url, encoding):
     # <meta charset="utf-8">
 
     rmetaCharset = [
-        r'content="text/html; charset=(.*)"',
-        r'charset="(.*)"'
+        r'meta http-equiv="Content-Type" content="text/html; charset=(.*)"',
+        r'meta charset="(.*)"'
     ]
 
     encoding1 = 'gbk'
@@ -230,10 +241,10 @@ def thread_getOneBook(url, encoding):
                 print('章节url未找到')
                 continue
 
-            # 判断是否有感言
-            if re.findall(r'.*?章', chart_title) is None:
-                print('抓到作者感言，跳过...')
-                continue
+            # # 判断是否有感言
+            # if re.findall(r'.*?章', chart_title) is None:
+            #     print('抓到作者感言，跳过...')
+            #     continue
 
             url_chartTitle[chart_url] = chart_title
 
@@ -313,24 +324,30 @@ urls = [
     # 'http://www.26ksw.cc/book/10258/',
     # 'http://www.biquge001.com/Book/17/17605/',
     # 'http://www.biquge001.com/Book/17/17605/',
-    'http://www.biquge001.com/Book/8/8460/',
+    # 'http://www.biquge001.com/Book/8/8460/',
     # 'https://www.xbiquge.la/7/7877/',
     # 'http://www.ibiqu.net/book/7/',
     # 'https://www.biquge.biz/22_22780/',
     # 'https://www.biqugee.com/book/1366/',
-    # 'https://www.bige7.com/book/11742/'  # .listmain a
+    # 'https://www.bige7.com/book/11742/'
     # 'http://www.b5200.net/50_50537/',
     # 'https://biquge96.com/30_30171/',
     # 'http://www.b5200.net/52_52542/',
     # 'https://www.bige7.com/book/2749/',
     # 'http://www.soduso.cc/novel/57634/',
+    # 'http://www.soduso.cc/novel/57634/'
+    # 'http://www.biquge001.com/Book/2/2321/'
+    # 'https://www.xbiquge.la/0/745/'
+    # 'http://www.biquge001.com/Book/18/18632/'
+    'http://www.399xs.com/book/0/611/'
 ]
 
+# 原址编码：gbk" src="https://www.baidu.com/js/opensug.js
 
 if __name__ == "__main__":
 
     argvNum = len(sys.argv)
-    if(argvNum >= 2): # 参数1是本文件名 参数2为小说目录页地址
+    if(argvNum >= 2):  # 参数1是本文件名 参数2为小说目录页地址
         print('参数个数为:', argvNum, '个参数。')
         print('参数列表:', str(sys.argv))
 
