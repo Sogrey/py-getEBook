@@ -91,6 +91,14 @@ Config = {
             '最新永久域名：'
         ],
     },
+    'https://www.yousheng8.com/':{
+        'menuList': '.listmain a',
+        'menuUrlIsFull': False,
+        'bookName': '#maininfo #info h1',  # 小说名css选择器
+        'chapterTile': '#book .content h1',
+        'chapterContent': 'div#content.showtxt',
+        'ads': [],
+    },
 }
 
 # print(Config['http://www.biquge001.com/'])

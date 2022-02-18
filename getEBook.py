@@ -70,6 +70,7 @@ def get_ChartTxt(baseUrl, url, title, num, totalNum, encoding):
         for ad in ads:
             content = re.sub(r'%s' % (ad), ' ', content)
 
+
     # 单独写入这一章
     try:
         with open(r'.\%s\%s\%s %s.txt' % (OutputDir, title, numStr, chapterTile), 'w', encoding='utf-8') as f:
@@ -78,8 +79,7 @@ def get_ChartTxt(baseUrl, url, title, num, totalNum, encoding):
         f.close()
 
         end = time.time()
-        print('下载 %s %s  完成，运行时间  %0.2f s.' %
-              (num, chapterTile, (end - start)))
+        print('下载 %s %s  完成，运行时间  %0.2f s.' % (num, chapterTile, (end - start)))
 
     except Exception as e:
         print(e)
@@ -339,7 +339,8 @@ urls = [
     # 'http://www.biquge001.com/Book/2/2321/'
     # 'https://www.xbiquge.la/0/745/'
     # 'http://www.biquge001.com/Book/18/18632/'
-    'http://www.399xs.com/book/0/611/'
+    # 'http://www.399xs.com/book/0/611/'
+    'https://www.yousheng8.com/yousheng/704/'
 ]
 
 # 原址编码：gbk" src="https://www.baidu.com/js/opensug.js
