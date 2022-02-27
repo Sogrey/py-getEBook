@@ -2,6 +2,8 @@
 
 python爬取小说
 
+> This repository has been merged into https://github.com/Sogrey/python-tools/tree/main/download-ebook
+
 > 仅用于python交流学习，请勿用于商业用途
 
 | 序号 | URL                        | 匹配度 |
